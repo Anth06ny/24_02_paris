@@ -12,6 +12,7 @@ fun main() {
 
 }
 
+
 class ThermometerBean(val min: Int, val max: Int, value: Int) {
 
     var value = value.coerceIn(min, max)
@@ -23,6 +24,9 @@ class ThermometerBean(val min: Int, val max: Int, value: Int) {
         fun getCelsiusThermometer() = ThermometerBean(-30, 50, 0)
         fun getFahrenheitThermometer() = ThermometerBean(20, 120, 32)
     }
+
+
+
 }
 
 class PrintRandomIntBean(var max: Int) {
