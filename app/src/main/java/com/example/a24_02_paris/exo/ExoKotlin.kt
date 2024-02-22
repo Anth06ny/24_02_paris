@@ -1,6 +1,6 @@
-package com.example.a24_02_sagemcom.exo
+package com.example.a24_02_paris.exo
 
-import com.example.a24_02_sagemcom.PlaneBean
+import com.example.a24_02_paris.PlaneBean
 
 fun main() {
 

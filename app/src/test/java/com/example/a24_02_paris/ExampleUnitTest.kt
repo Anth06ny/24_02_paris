@@ -1,4 +1,4 @@
-package com.example.a24_02_sagemcom
+package com.example.a24_02_paris
 
 import org.junit.Test
 

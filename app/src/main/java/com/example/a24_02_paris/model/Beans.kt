@@ -1,4 +1,4 @@
-package com.example.a24_02_sagemcom.model
+package com.example.a24_02_paris.model
 
 import java.util.Random
 
@@ -9,6 +9,32 @@ fun main() {
     val t = ThermometerBean(1, 2, 3)
     val car = CarBean("ijkj", "jkj")
 
+
+}
+
+class RandomName {
+
+    private var list = arrayListOf("Toto", "Tata", "Titi")
+
+    private var oldValue = ""
+
+    fun add(name:String) = if(name.isNotBlank() && name !in list) list.add(name) else false
+
+    fun next() = list.random()
+
+    fun nextDiffV2()= list.filter {it != oldValue}.random().also {oldValue =it }
+
+    fun next2() = Pair(nextDiff(), nextDiff())
+
+    fun nextDiff(): String {
+        var newValue = next()
+        while(newValue  == oldValue) {
+            newValue = next()
+        }
+
+        oldValue = newValue
+        return oldValue
+    }
 
 }
 

@@ -1,4 +1,4 @@
-package com.example.a24_02_sagemcom.exo
+package com.example.a24_02_paris.exo
 
 const val PRICE_CROISSANT = 0.95
 const val PRIX_SANDWITCH = 4

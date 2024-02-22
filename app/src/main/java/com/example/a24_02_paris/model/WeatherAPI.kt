@@ -1,4 +1,4 @@
-package com.example.a24_02_sagemcom.model
+package com.example.a24_02_paris.model
 
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
@@ -8,6 +8,7 @@ import okhttp3.Request
 fun main() {
     val res = WeatherAPI.loadWeather("Toulouse")
     println("Il fait ${res.main.temp}° à ${res.name} avec un vent de ${res.wind.speed} m/s")
+
 }
 object WeatherAPI {
 
@@ -36,6 +37,8 @@ object WeatherAPI {
     }
 
     fun sendGet(url: String): String {
+
+
         println("url : $url")
         //Création de la requête
         val request = Request.Builder().url(url).build()

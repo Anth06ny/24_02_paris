@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.a24_02_sagemcom"
+    namespace = "com.example.a24_02_paris"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.a24_02_sagemcom"
+        applicationId = "com.example.a24_02_paris"
         minSdk = 28
         targetSdk = 34
         versionCode = 1

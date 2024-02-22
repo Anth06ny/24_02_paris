@@ -13,6 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "24_02_sagemcom"
+rootProject.name = "24_02_paris"
 include(":app")
- 

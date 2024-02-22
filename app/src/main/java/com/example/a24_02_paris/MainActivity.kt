@@ -1,9 +1,7 @@
-package com.example.a24_02_sagemcom
+package com.example.a24_02_paris
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.example.a24_02_sagemcom.exo.PRICE_CROISSANT
-import com.example.a24_02_sagemcom.exo.boulangerie
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
