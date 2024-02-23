@@ -1,7 +1,9 @@
 package com.example.a24_02_paris.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +26,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,9 +59,18 @@ fun SearchScreenPreview() {
 
 @Composable
 fun SearchScreen() {
-    Column(modifier =Modifier.background(MaterialTheme.colorScheme.background).padding(8.dp)) {
 
-        SearchBar()
+    println("SearchScreen recomposition")
+
+    var searchText: MutableState<String> = remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(8.dp)
+    ) {
+
+        SearchBar(searchText = searchText)
 
         Spacer(Modifier.size(8.dp))
 
@@ -63,17 +79,22 @@ fun SearchScreen() {
             modifier = Modifier.weight(1f)
 
         ) {
-            items(pictureList.size) {
-                PictureRowItem(data = pictureList[it])
+            println("LazyColumn recomposition")
+
+            val list = pictureList.filter { it.title.contains(searchText.value) }
+
+            items(list.size) {
+                PictureRowItem(data = list[it])
             }
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center) {
+            horizontalArrangement = Arrangement.Center
+        ) {
             Button(
-                modifier = Modifier.widthIn(min =120.dp),
-                onClick = { /* Do something! */ },
+                modifier = Modifier.widthIn(min = 120.dp),
+                onClick = { searchText.value = "" },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
                 Icon(
@@ -87,7 +108,7 @@ fun SearchScreen() {
             Spacer(Modifier.size(8.dp))
 
             Button(
-                modifier = Modifier.widthIn(min =120.dp),
+                modifier = Modifier.widthIn(min = 120.dp),
                 onClick = { /* Do something! */ },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
@@ -104,10 +125,13 @@ fun SearchScreen() {
 }
 
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
+fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>) {
+
+
+
     TextField(
-        value = "", //Valeur par défaut
-        onValueChange = {newValue->}, //Action
+        value = searchText.value, //Valeur par défaut
+        onValueChange = { newValue -> searchText.value = newValue }, //Action
         leadingIcon = { //Image d'icone
             Icon(
                 imageVector = Icons.Default.Search,
@@ -132,6 +156,9 @@ fun SearchBar(modifier: Modifier = Modifier) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable //Composable affichant 1 PictureBean
 fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
+
+    var expended by remember { mutableStateOf(false) }
+
     Row(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -154,16 +181,18 @@ fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
                 .widthIn(max = 100.dp)
         )
 
-        Column {
+        Column(modifier = Modifier.clickable {
+            expended = !expended
+        }) {
             Text(
                 text = data.title,
                 fontSize = 20.sp
             )
             Text(
-                text = data.longText.take(20) + "...",
+                text = if(expended) data.longText else  data.longText.take(20) + "...",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.primary
-                ,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.animateContentSize()
             )
         }
 
