@@ -32,8 +32,20 @@ object WeatherAPI {
 
         //Eventuel contrôle ou extraction de données
 
+
         //Retourner la donnée
         return data
+    }
+
+    fun loadWeatherAround(cityName: String): List<WeatherBean> {
+        //Réaliser la requête.
+        val json: String = sendGet("https://api.openweathermap.org/data/2.5/find?q=$cityName&cnt=5&appid=b80967f0a6bd10d23e44848547b26550&units=metric&lang=fr")
+
+        //Parser le JSON avec le bon bean et GSON
+        val data  = gson.fromJson(json, WeatherAroundResult::class.java)
+
+        //Retourner la donnée
+        return data.list
     }
 
     fun sendGet(url: String): String {
@@ -57,21 +69,14 @@ object WeatherAPI {
 /* -------------------------------- */
 // Beans
 /* -------------------------------- */
-data class WeatherBean(
-    val main: TempBean,
-    val name: String,
-    val wind: WindBean,
-)
+data class WeatherAroundResult(var list : List<WeatherBean>)
 
-data class TempBean(
-    val humidity: Int,
-    val pressure: Int,
-    val temp: Double,
-    val temp_max: Double,
-    val temp_min: Double
-)
+data class WeatherBean(var main : TempBean,var wind : WindBean,var name : String, var weather : List<DescriptionBean>)
+data class TempBean(var temp: Double)
+data class WindBean(var speed: Double)
 
-data class WindBean(
-    val deg: Int,
-    val speed: Double
+data class DescriptionBean(
+    var description: String,
+    var icon: String,
+    var main: String
 )

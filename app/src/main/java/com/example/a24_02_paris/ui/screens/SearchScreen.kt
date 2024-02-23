@@ -1,6 +1,7 @@
 package com.example.a24_02_paris.ui.screens
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,12 +38,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.example.a24_02_paris.R
+import com.example.a24_02_paris.Routes
+import com.example.a24_02_paris.model.MainViewModel
 import com.example.a24_02_paris.model.PictureBean
-import com.example.a24_02_paris.model.pictureList
+import com.example.a24_02_paris.ui.ErrorComponent
 import com.example.a24_02_paris.ui.theme._24_02_parisTheme
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -58,11 +64,9 @@ fun SearchScreenPreview() {
 }
 
 @Composable
-fun SearchScreen() {
+fun SearchScreen(navController: NavHostController? = null, viewModel : MainViewModel = viewModel()) {
 
     println("SearchScreen recomposition")
-
-    var searchText: MutableState<String> = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -70,9 +74,16 @@ fun SearchScreen() {
             .padding(8.dp)
     ) {
 
-        SearchBar(searchText = searchText)
+        SearchBar(searchText = viewModel.searchText)
 
         Spacer(Modifier.size(8.dp))
+
+        AnimatedVisibility(visible = viewModel.runInProgress){
+            CircularProgressIndicator()
+        }
+
+        ErrorComponent(viewModel.errorMessage)
+
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -81,10 +92,14 @@ fun SearchScreen() {
         ) {
             println("LazyColumn recomposition")
 
-            val list = pictureList.filter { it.title.contains(searchText.value) }
+            val list = viewModel.myList.filter { it.title.contains(viewModel.searchText.value) }
 
             items(list.size) {
-                PictureRowItem(data = list[it])
+                PictureRowItem(data = list[it],
+                    onPictureClick = {
+                        navController?.navigate(Routes.DetailScreen.withObject(list[it]))
+                    }
+                )
             }
         }
 
@@ -94,7 +109,7 @@ fun SearchScreen() {
         ) {
             Button(
                 modifier = Modifier.widthIn(min = 120.dp),
-                onClick = { searchText.value = "" },
+                onClick = { viewModel.uploadSearchText("")  },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
                 Icon(
@@ -109,7 +124,7 @@ fun SearchScreen() {
 
             Button(
                 modifier = Modifier.widthIn(min = 120.dp),
-                onClick = { /* Do something! */ },
+                onClick = { viewModel.loadData() },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
                 Icon(
@@ -126,9 +141,6 @@ fun SearchScreen() {
 
 @Composable
 fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>) {
-
-
-
     TextField(
         value = searchText.value, //Valeur par défaut
         onValueChange = { newValue -> searchText.value = newValue }, //Action
@@ -153,9 +165,35 @@ fun SearchBar(modifier: Modifier = Modifier, searchText: MutableState<String>) {
     )
 }
 
+@Composable
+fun SearchBarOfficiel(modifier: Modifier = Modifier, value : String, onValueChange : (String)->Unit) {
+    TextField(
+        value = value, //Valeur par défaut
+        onValueChange = onValueChange, //Action
+        leadingIcon = { //Image d'icone
+            Icon(
+                imageVector = Icons.Default.Search,
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = null
+            )
+        },
+        label = { Text("Enter text") }, //Texte d'aide qui se déplace
+        placeholder = { //Texte d'aide qui disparait
+            //Dans string.xml
+            //Text(stringResource(R.string.placeholder_search))
+            //En dur
+            Text("Recherche")
+        },
+        //Comment le composant doit se placer
+        modifier = modifier
+            .fillMaxWidth() // Prend toute la largeur
+            .heightIn(min = 56.dp) //Hauteur minimum
+    )
+}
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable //Composable affichant 1 PictureBean
-fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
+fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean, onPictureClick : ()->Unit) {
 
     var expended by remember { mutableStateOf(false) }
 
@@ -179,6 +217,9 @@ fun PictureRowItem(modifier: Modifier = Modifier, data: PictureBean) {
             modifier = Modifier
                 .heightIn(max = 100.dp) //Sans hauteur il prendra tous l'écran
                 .widthIn(max = 100.dp)
+                .clickable {
+                    onPictureClick()
+                }
         )
 
         Column(modifier = Modifier.clickable {

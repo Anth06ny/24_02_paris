@@ -3,18 +3,21 @@ package com.example.a24_02_paris
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.a24_02_paris.model.MainViewModel
+import com.example.a24_02_paris.model.PictureBean
+import com.example.a24_02_paris.ui.screens.DetailScreen
 import com.example.a24_02_paris.ui.screens.SearchScreen
 import com.example.a24_02_paris.ui.theme._24_02_parisTheme
 
@@ -25,32 +28,43 @@ class ComposeExActivity : ComponentActivity() {
             _24_02_parisTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    SearchScreen()
+                    AppNavigation()
                 }
             }
         }
     }
 }
 
+sealed class Routes(val route: String) {
+    object SearchScreen : Routes("searchScreen")
+    object DetailScreen : Routes("detailScreen/{id}") {
+        fun withId(id: Int) = "detailScreen/$id"
+        fun withObject(data : PictureBean) = "detailScreen/${data.id}"
+    }
+}
+
 @Composable
-fun Experience() {
-    println("Expericence() : Recomposition")
+fun AppNavigation() {
 
-    var j = remember { 5 }
-    var i by remember { mutableIntStateOf(5) }
+    val navController: NavHostController = rememberNavController()
 
-    var text = "i=$i j=$j"
+    val viewModel : MainViewModel = viewModel()
 
-    Row {
-        Button(
-            onClick = {
-                i++
-                j++
-                println(text)
-            }
+
+
+    NavHost(navController = navController, startDestination = Routes.SearchScreen.route) {
+        //Route 1
+        composable(Routes.SearchScreen.route) {
+            SearchScreen(navController, viewModel = viewModel)
+        }
+
+        //Route 2
+        composable(
+            route = Routes.DetailScreen.route,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
         ) {
-            println("Button() : Recomposition")
-            Text(text)
+            val id = it.arguments?.getInt("id") ?: 1
+            DetailScreen(idPicture = id, navController = navController, viewModel =  viewModel)
         }
     }
 }
