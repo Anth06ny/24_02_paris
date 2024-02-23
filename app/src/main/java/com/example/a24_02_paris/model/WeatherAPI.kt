@@ -64,7 +64,6 @@ data class WeatherBean(
 )
 
 data class TempBean(
-    val feels_like: Int,
     val humidity: Int,
     val pressure: Int,
     val temp: Double,

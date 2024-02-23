@@ -71,11 +71,9 @@ dependencies {
 
     //Parsing JSON
     implementation("com.google.code.gson:gson:+")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
 
 
 }
